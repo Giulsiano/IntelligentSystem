@@ -13,7 +13,6 @@ pattern_len = numel(pattern);
 column = {'A', 'B', 'C', 'D'};
 data = {};
 
-
 % load data from files that matches pattern which are located in the directory
 for i = 1:pattern_len
     cur_pattern = pattern{i};
