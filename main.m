@@ -6,6 +6,7 @@ if exist('load_conf.m', 'file') == false
     error('ISP:fileNotFound', ['The project requires load_conf.m to be in the same '...
                                'directory to work properly']);
 end
+
 % load configuration variables
 load_conf;
 out_dir_path = [PROJECT_DIR filesep OUTPUT_DIR filesep];
@@ -29,10 +30,8 @@ if exist(db_path, 'file') == false
     time_data = load_data(DATA_DIRS, FILE_PATTERN);
     fprintf(' done\n');
     
-    % delete rows containing a nan value
-    for i = 1:numel(time_data)
-        time_data{i}(any(isnan(time_data{i}), 2), :) = [];
-    end 
+    clean_data(time_data);
+    
     fprintf('Saving data to %s...', db_path);
     save(db_path, 'time_data');
     fprintf(' done\n');
