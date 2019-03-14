@@ -35,7 +35,7 @@ if exist(db_path, 'file') == false
     fprintf('Saving data to %s...', db_path);
     save(db_path, 'time_data');
     fprintf(' done\n');
-else
+elseif DELETE_DATA == 0
     fprintf('Loading data from %s...', db_path);
     load(db_path, 'time_data');
     fprintf(' done\n');
@@ -58,6 +58,7 @@ def_freq_feat = compute_features(freq_data, features(:, 2));
 
 % make figures of each computed features
 pattern_name = regexprep(FILE_PATTERN, '\*|\..*', '');
+pattern_num = size(FILE_PATTERN);
 for i = 1:numel(features(:, 1))
     def_time_feat_figures = plot_feature(def_time_feat(:, :, i));
     
