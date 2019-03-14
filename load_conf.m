@@ -33,3 +33,6 @@ OUTPUT_DIR = 'output';
 
 % The number of sensor we consider in the xlsx files
 SENSOR_NUM = 3;
+
+% Set to 1 if you want to load data from files each time you run main.m
+DELETE_DATA = 1;

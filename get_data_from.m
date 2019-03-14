@@ -49,13 +49,13 @@ function [ data, extra_data ] = get_data_from( file_path, column_idx, extra_data
 %                                                         ... };
 %%  Code
 
-if (exist(file_path, 'file') == 0),
+if (exist(file_path, 'file') == 0)
     error('Matlab:ISP:fileNotFound', 'File %s not found', file_path);
 end
-if (nargin < 3),
+if (nargin < 3)
     extra_data_idx = {};
 end
-if (nargin < 2),
+if (nargin < 2)
     error('Matlab:ISP:argsError', 'column_idx is missing.\n');                           
 end
 
@@ -63,12 +63,13 @@ end
 file_data = xlsread(file_path); 
 
 % find the extra data and store them into the proper output
-if (~isempty(extra_data_idx)),
+if (~isempty(extra_data_idx))
     extra_data = cell(size(extra_data_idx, 2), 2);
+    
     % translate the A1 strings to row and column indeces
     [ed_row, ed_col] = A1toR1C1(extra_data_idx);
-    for i = 1:length(ed_row),
-        if (isnan(ed_row(i))),
+    for i = 1:length(ed_row)
+        if (isnan(ed_row(i)))
             % the user wants a column in the extra data
             extra_data{i, 1} = extra_data_idx{i};
             extra_data{i, 2} = file_data(:,ed_col(i));
