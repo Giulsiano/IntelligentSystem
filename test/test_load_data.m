@@ -9,10 +9,11 @@ pattern =  {'*supine.xlsx';
              '*walking.xlsx';
              '*stairs.xlsx';
     };
+which load_data
 act = load_data(dir, pattern);
 verifyClass(tc, dir, 'char');
 verifySize(tc, act, [numel(pattern) 1]);
-for i = 1:numel(act),
+for i = 1:numel(act)
     verifyClass(tc, act{i}, 'double');
 end
 end
