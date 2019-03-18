@@ -30,11 +30,13 @@ if exist(db_path, 'file') == false
     time_data = load_data(DATA_DIRS, FILE_PATTERN);
     fprintf(' done\n');
     
-    clean_data(time_data);
+    % Interpolate NaNs numbers
+    cleaned_data = cellfun(@(x) interpolate_nans(x, 3, true), time_data, 'UniformOutput', false);
     
     fprintf('Saving data to %s...', db_path);
     save(db_path, 'time_data');
     fprintf(' done\n');
+    
 elseif DELETE_DATA == 0
     fprintf('Loading data from %s...', db_path);
     load(db_path, 'time_data');

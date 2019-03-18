@@ -1,18 +1,10 @@
-function a = remove_array_nan(raw_data, interval_half_len, by_cols)
+function a = remove_array_nan(raw_data, interval_half_len)
 % Function which checks if any NaN is present into the data passed by
 % parameter, if any Nan has been found then interpolate the data with its
 % neighbour in order to have an appropriate value
 
-% This function works on column by default, so if the user wants it to work
-% on rows we have to transpose data first
-
-if by_cols == false
-    data = raw_data';
-else 
-    data = raw_data;
-end
-
 % Find nans and try to substitute them with the mean of x neigh_num values
+data = raw_data;
 nan_idx = find(isnan(data));
 data_len = numel(data);
 for j = 1:size(nan_idx)
