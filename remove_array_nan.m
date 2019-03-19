@@ -7,7 +7,7 @@ function a = remove_array_nan(raw_data, interval_half_len)
 data = raw_data;
 nan_idx = find(isnan(data));
 data_len = numel(data);
-for j = 1:size(nan_idx)
+for j = 1:numel(nan_idx)
     value_idx = nan_idx(j);
     
     % Compute the mean of [interval_half_len:nan_value[
