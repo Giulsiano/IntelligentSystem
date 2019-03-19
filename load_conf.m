@@ -34,5 +34,12 @@ OUTPUT_DIR = 'output';
 % The number of sensor we consider in the xlsx files
 SENSOR_NUM = 3;
 
-% Set to 1 if you want to load data from files each time you run main.m
+% Set to 1 if you want to load raw data from files each time you run main.m
+% instead of loading them from the DB
 DELETE_DATA = 1;
+
+% Set the name of the directory that will store figures
+FIGURES_OUTPUT_DIR = 'figures';
+
+% Set this to 1 to save figures to the output directory also
+STORE_FIGURES = 1;
