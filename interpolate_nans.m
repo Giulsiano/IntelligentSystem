@@ -8,7 +8,7 @@ else
 end
 
 if mod(interval_len, 2) == 0
-    throw(MException('ISP:InvalidArgument', 'interval_len must7 be odd'));
+    throw(MException('ISP:InvalidArgument', 'interval_len must be odd'));
 end
 
 [r, c] = size(data);

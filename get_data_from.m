@@ -1,7 +1,7 @@
 function [ data, extra_data ] = get_data_from( file_path, column_idx, extra_data_idx)
 %get_data_from  Loads the data from xls files supported by Matlab 
 %The function is a wrapper for xlsread that loads data in a cleaner way than
-%xlsread do by put data which aren't stored in column with a header in the cell
+%xlsread does by putting data which aren't stored in column with a header in the cell
 %array extra_data. 
 %   The function will use xlsread for reading file_path, but this function will
 %   remove empty column and rows that xlsread create and will put extra data
@@ -86,7 +86,7 @@ end
 [~, data_col] = A1toR1C1(column_idx);
 data = file_data(:, data_col);
 
-% remove rows containing only nan
+% remove rows containing only nan. This is for cleaning the exceeding rows.
 data(all(isnan(data), 2), :) = [];
 
 end

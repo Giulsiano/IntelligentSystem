@@ -17,7 +17,7 @@ DATA_DIRS = { 'Measurements_10_volunteers/Volunteer 1';
 };
 
 % Which file names the program should load from DATA_DIRS. Only * wildcard character is supported.
-% main.m can load only xls files
+% main.m can load only xlsx files
 FILE_PATTERN = {'*supine.xlsx';
              '*dorsiflexion.xlsx';
              '*walking.xlsx';
