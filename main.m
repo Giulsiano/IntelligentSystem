@@ -25,13 +25,14 @@ if exist(out_dir_path, 'dir') == false
 end
 
 % load data of the positions of the volunteers
-if exist(db_path, 'file') == false
+if exist(db_path, 'file') == false || DELETE_DATA == 1
     fprintf('Loading data from files...');
     time_data = load_data(DATA_DIRS, FILE_PATTERN);
     fprintf(' done\n');
     
     % Interpolate NaNs numbers
     cleaned_data = cellfun(@(x) interpolate_nans(x, 3, true), time_data, 'UniformOutput', false);
+    
     
     fprintf('Saving data to %s...', db_path);
     save(db_path, 'time_data');
@@ -45,7 +46,7 @@ end
 
 % compute fourier transform of whole sensors data
 fprintf('Compute fourier transform...');
-freq_data = cellfun(@freq_transform, time_data, 'UniformOutput', false);
+freq_data = cellfun(@freq_transform, cleaned_data, 'UniformOutput', false);
 fprintf(' done\n');
 
 % compute selected feature for whole patterns
@@ -55,7 +56,7 @@ features = {'min', @(x) min(x(:, 1:SENSOR_NUM));
             'std', @(x) std(x(:, 1:SENSOR_NUM));
             'diff', @sensor_diff;
             };
-def_time_feat = compute_features(time_data, features(:, 2));
+def_time_feat = compute_features(cleaned_data, features(:, 2));
 def_freq_feat = compute_features(freq_data, features(:, 2));
 
 % make figures of each computed features
