@@ -60,7 +60,7 @@ if (nargin < 2)
 end
 
 % load file into memory
-file_data = xlsread(file_path); 
+file_data = xlsread(file_path, '', '', 'basic'); 
 
 % find the extra data and store them into the proper output
 if (~isempty(extra_data_idx))
