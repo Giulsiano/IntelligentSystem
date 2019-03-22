@@ -25,24 +25,13 @@ if exist(out_dir_path, 'dir') == false
 end
 
 % load data of the positions of the volunteers
-if exist(db_path, 'file') == false || DELETE_DATA == 1
-    fprintf('Loading data from files...');
-    time_data = load_data(DATA_DIRS, FILE_PATTERN);
-    fprintf(' done\n');
-    
-    % Interpolate NaNs numbers
-    cleaned_data = cellfun(@(x) interpolate_nans(x, 3, true), time_data, 'UniformOutput', false);
-    
-    
-    fprintf('Saving data to %s...', db_path);
-    save(db_path, 'time_data');
-    fprintf(' done\n');
-    
-elseif DELETE_DATA == 0
-    fprintf('Loading data from %s...', db_path);
-    load(db_path, 'time_data');
-    fprintf(' done\n');
-end
+data_manipolation;
+
+% create the figures in order to have a view of patterns
+produce_figures;
+
+% features extraction and selection
+features;
 
 % compute fourier transform of whole sensors data
 fprintf('Compute fourier transform...');
