@@ -1,4 +1,4 @@
-function m = reshape_normalized_data(data)
+function m = zip_data(data)
 %RESHAPE_NORMALIZED_DATA Returns a matrix containing all data from input
     % It expects a cell array of any size which contains matrices having
     % all the same number of cols. This function takes the column at index

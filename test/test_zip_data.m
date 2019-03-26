@@ -1,4 +1,4 @@
-function [ tests ] = test_reshape_normalized_data
+function [ tests ] = test_zip_data
 tests = functiontests(localfunctions);
 end
 

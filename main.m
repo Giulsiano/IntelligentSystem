@@ -11,7 +11,6 @@ end
 load_conf;
 out_dir_path = [PROJECT_DIR filesep OUTPUT_DIR filesep];
 db_path = [out_dir_path DB_FILE_NAME];
-global SENSOR_NUM;
 
 % add to the matlab path the directory needed by this program
 old_path = path;
@@ -32,37 +31,6 @@ produce_figures;
 
 % features extraction and selection
 features;
-
-% compute fourier transform of whole sensors data
-fprintf('Compute fourier transform...');
-freq_data = cellfun(@freq_transform, cleaned_data, 'UniformOutput', false);
-fprintf(' done\n');
-
-% compute selected feature for whole patterns
-features = {'min', @(x) min(x(:, 1:SENSOR_NUM));
-            'max', @(x) max(x(:, 1:SENSOR_NUM));
-            'mean', @(x) mean(x(:, 1:SENSOR_NUM));
-            'std', @(x) std(x(:, 1:SENSOR_NUM));
-            'diff', @sensor_diff;
-            };
-def_time_feat = compute_features(cleaned_data, features(:, 2));
-def_freq_feat = compute_features(freq_data, features(:, 2));
-
-% make figures of each computed features
-pattern_name = regexprep(FILE_PATTERN, '\*|\..*', '');
-pattern_num = size(FILE_PATTERN);
-for i = 1:numel(features(:, 1))
-    def_time_feat_figures = plot_feature(def_time_feat(:, :, i));
-    
-    for j = 1:SENSOR_NUM
-        for k = 1:pattern_num
-            figure(def_time_feat_figures{k, j});
-            fig_title = sprintf('%s sensor %d %s time', features{i, 1}, j, pattern_name{k});
-            title(fig_title);
-            ylabel(features{i, 1});
-        end
-    end
-end
 
 % restore original path
 path(old_path);
