@@ -27,16 +27,27 @@ if exist(db_path, 'file') == false || DELETE_DATA == true
     % Interpolate NaNs numbers and do the normalization required
     cleaned_data = cellfun(@(x) interpolate_nans(x, 3, true), time_data, 'UniformOutput', false); 
     normalized_data = cellfun(@(x) normalize_data(x, SENSOR_NUM), cleaned_data, 'UniformOutput', false);
+    
+    % Remove time information on the sensors' data
+    normalized_data = cellfun(@(x) x(:, 1:SENSOR_NUM), normalized_data, 'UniformOutput', false);
     clear cleaned_data;
     
-    % Save normalized data into the database
+    % Put all sensors' data together into a single matrix, one matrix for each
+    % position
+    sensor_data = cell([size(normalized_data, 1) 1]);
+    for i = 1:size(normalized_data, 1)
+        sensor_data{i} = zip_data(normalized_data(i, :));
+    end
+    clear normalized_data;
+    
+    % Save manipulated sensors' data into the database
     fprintf('Saving data to %s...', db_path);
-    save(db_path, 'normalized_data');
+    save(db_path, 'sensor_data');
     fprintf(' done\n');
     
 elseif DELETE_DATA == 0
-    % Directly load from the database stored into the output directory
+    % Directly load data from the database stored into the output directory
     fprintf('Loading data from %s...', db_path);
-    load(db_path, 'normalized_data');
+    load(db_path, 'sensor_data');
     fprintf(' done\n');
 end

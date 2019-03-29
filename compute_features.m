@@ -27,6 +27,7 @@ for i = 1:numel(feat_func)
                                 'UniformOutput', false, ...
                                 'ErrorHandler', @error_h);
 end
+
 end
 
 function result = error_h (S, varargin)
