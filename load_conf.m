@@ -43,3 +43,9 @@ FIGURES_OUTPUT_DIR = 'figures';
 
 % Set this to 1 to save figures to the output directory also
 STORE_FIGURES = 1;
+
+% Path where the program will store figures
+FIG_PATH = 'output/figures';
+
+% Categories to take in account for classification
+CATEGORIES = {'supine' 'dorsiflexion' 'walking' 'stairs'};

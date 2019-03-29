@@ -1,20 +1,19 @@
 % Giuliano Peraz <giuliano.peraz@gmail.com>
+global CATEGORIES;
 
 % Exit if no data variable has been loaded into the workspace
-if (exist('normalized_data', 'var')) ~= 1
+if (exist('sensor_data', 'var')) ~= 1
     throw(MException('ISP:VariableNotFound', '%s can''t run without normalized_data variable', mfilename));
 end
 
-% Put all sensors' data together into a single matrix per position
-sensor_data = cell([size(normalized_data, 1) 1]);
-for i = 1:size(normalized_data, 1)
-    sensor_data{i} = zip_data(normalized_data{i, :});
-end
-
+%% Feature extraction
 % Define features and the chunk size of sensor data to take in account for
 % features
-chunk_size = [5 6 7 8];
-selected_feat = {@min; @max; @mean; @std};
+chunk_size = 5:1:12;
+categories_num = numel(CATEGORIES);
+chunk_num = numel(chunk_size);
+selected_aggr_feat = {@min; @max; @mean; @std};
+selected_feat_num = numel(selected_aggr_feat);
 
 % Arrange data in case they are not multiple of any chunk size
 arranged_data = arrange_data(sensor_data, chunk_size);
