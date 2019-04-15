@@ -24,14 +24,18 @@ if exist(configuration.out_dir_path, 'dir') == false
     mkdir(configuration.out_dir_path);
 end
 
-% load data of the positions of the volunteers
+% load data of the positions of the volunteers and make some manipolation
+% like normalization and unify data from all sensor into one
+fprintf('Manipolate data...\n');
 data_manipolation;
 
-% create the figures in order to have a view of patterns
-produce_figures;
-
 % features extraction and selection
+fprintf('Feature extraction and selection...\n');
 features;
+
+% run the neuronal network
+
+% run the fuzzy system
 
 % restore original path
 path(old_path);

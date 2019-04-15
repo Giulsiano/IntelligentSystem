@@ -19,6 +19,7 @@ if exist(configuration.db_path, 'file') == false || configuration.DELETE_DATA ==
     time_data = load_data(configuration.DATA_DIRS, configuration.FILE_PATTERN); 
     
     % Interpolate NaNs numbers and do the normalization required
+    fprintf('--> Interpolate and normalize data...\n');
     cleaned_data = cellfun(@(x) interpolate_nans(x, 3, true), time_data, 'UniformOutput', false); 
     normalized_data = cellfun(@(x) normalize_data(x(:, 1:configuration.SENSOR_NUM), configuration.SENSOR_NUM), ...
                                                     cleaned_data, 'UniformOutput', false);
@@ -29,12 +30,9 @@ if exist(configuration.db_path, 'file') == false || configuration.DELETE_DATA ==
     
     % Put all sensors' data together into a single matrix, one matrix for each
     % position
-    sensor_data = cell([size(normalized_data, 1) 1]);
-    for i = 1:size(normalized_data, 1)
-        sensor_data{i} = zip_data(normalized_data(i, :));
-    end
-    clear normalized_data;
-    
+    fprintf('--> Put all data sensor into a single matrix\n');
+    sensor_data = normalized_data;
+
     % Save manipulated sensors' data into the database
     fprintf('--> Saving data to %s...\n', configuration.db_path);
     save(configuration.db_path, 'sensor_data', 'freq_data', 'freq_domain');
