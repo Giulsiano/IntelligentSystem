@@ -2,7 +2,7 @@
 global configuration;
 
 % Exit if no data variable has been loaded into the workspace
-if (exist('sensor_data', 'var')) ~= 1
+if (exist('normalized_data', 'var')) ~= 1
     throw(MException('ISP:VariableNotFound', '%s can''t run without normalized_data variable', mfilename));
 end
 
@@ -67,6 +67,21 @@ for i = 1:ncategories
     end
 end
 
+% Make matlab to choose the best features for fitting a model
+criterion = @(xtrain, ytrain, xtest, ytest) sum(ytest ~= classify(xtest, xtrain, ytrain, 'quadratic'));
+inmodels = cell([1 nchunk]);
+histories = cell([1 nchunk]);
+for i = 1:nchunk
+    X = zip_data(category_features(:, i));
+    Y = zip_data(output_category(:, i));
+    [inmodels{1, i}, histories{1, i}] = sequentialfs(criterion, X, Y);
+end
 
-criterion = @(xtrain, ytrain, xtest, ytest) sum(ytest ~= classify(xtest, xtrain, ytrain));
-[inmodel, history] = sequentialfs(criterion, X, Y);
+% Select optimal chunk length wrt feature, that is choose the chunk
+% length(s) with less feature
+selected_inmodels = zip_data(inmodels);
+nfeats = sum(selected_inmodels, 2);
+chunk_index = find(nfeats == min(nfeats));
+selected_features = category_features(:, chunk_index(1)); % less chunks is better
+selected_features = cellfun(@(x) x(:, inmodels{1, chunk_index(1)}), selected_features, 'UniformOutput', false);
+output_category = output_category(:, chunk_index(1));
