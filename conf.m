@@ -42,10 +42,13 @@ DELETE_DATA = 1;
 FIGURES_OUTPUT_DIR = 'figures';
 
 % Set this to 1 to save figures to the output directory also
-STORE_FIGURES = 1;
+STORE_FIGURES = 0;
 
 % Path where the program will store figures
 FIG_PATH = 'output/figures';
 
 % Categories to take in account for classification
 CATEGORIES = {'supine' 'dorsiflexion' 'walking' 'stairs'};
+
+% Sensors' sampling time
+SAMPLING_TIME = 0.082;
