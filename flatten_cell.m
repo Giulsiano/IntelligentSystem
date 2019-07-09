@@ -6,6 +6,8 @@ function m = flatten_cell(cell)
 nel = numel(cell);
 nrows = size(cell{1}, 1);
 ncols = 0;
+
+% Compute total number of columns
 for i = 1:nel
     [temp_rows, temp_cols] = size(cell{i});
     check_rows = nrows == temp_rows;
@@ -15,6 +17,7 @@ for i = 1:nel
     ncols = ncols + temp_cols;
 end
 
+% Allocate the resultant matrix
 m = zeros(nrows, ncols);
 col_start = 1;
 for i = 1:nel

@@ -7,35 +7,37 @@ if exist('conf.m', 'file') == false
                                'directory to work properly']);
 end
 
-% load configuration variables
+% Load configuration variables
 global configuration;
 configuration = load_conf([pwd filesep 'conf.m']);
 configuration.out_dir_path = [configuration.PROJECT_DIR filesep configuration.OUTPUT_DIR filesep];
 configuration.db_path = [configuration.out_dir_path configuration.DB_FILE_NAME];
 
-% add to the matlab path the directory needed by this program
+% Add to the matlab path the directory needed by this program
 old_path = path;
 path([configuration.PROJECT_DIR filesep 'features'], path);
 path(configuration.PROJECT_DIR, path);
 
-% create project dirs if they are not present yet
+% Create project dirs if they are not present yet
 if exist(configuration.out_dir_path, 'dir') == false
     fprintf('Creating %s...', configuration.out_dir_path);
     mkdir(configuration.out_dir_path);
 end
 
-% load data of the positions of the volunteers and make some manipolation
+% Load data of the positions of the volunteers and make some manipolation
 % like normalization and unify data from all sensor into one
 fprintf('Manipolate data...\n');
 data_manipolation;
+fprintf('\n');
 
-% features extraction and selection
+% Features extraction and selection
 fprintf('Feature extraction and selection...\n');
 features;
+fprintf('\n');
 
 % run the neuronal network
 
-% run the fuzzy system
+% Run the fuzzy system
 
-% restore original path
+% Restore original path
 path(old_path);
