@@ -19,8 +19,8 @@ for i = 1:chunk_num
         temp_data_size(1) = temp_data_size(1) + rows_to_add;
         temp_data = zeros(temp_data_size);
         temp_data(1:end - rows_to_add, :) = data;
-        random_rows = randi([1 data_rows], 1, rows_to_add);
-        temp_data(end - rows_to_add + 1:end, :) = data(random_rows, :);
+        random_start = randi([1 data_rows - rows_to_add]);
+        temp_data(end - rows_to_add + 1:end, :) = data(random_start:random_start + rows_to_add - 1, :);
         arranged_data{1, i} = temp_data;
     end
 
