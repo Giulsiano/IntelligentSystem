@@ -35,7 +35,10 @@ fprintf('Feature extraction and selection...\n');
 features;
 fprintf('\n');
 
-% run the neuronal network
+% Run the neuronal network
+fprintf('Train neuronal networks\n');
+nn_train;
+fprintf('\n');
 
 % Run the fuzzy system
 
