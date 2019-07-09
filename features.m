@@ -10,78 +10,102 @@ end
 % Define features and the chunk size of sensor data to take in account for
 % features
 
-chunks = 1:12;
+chunkslen = 12:12:404;
 ncategories = numel(configuration.CATEGORIES);
-nchunk = numel(chunks);
-aggr_feat = {@min; @max; @mean; @std; @skewness; @kurtosis};
-nselected_feat = numel(aggr_feat);
-
-% % Put all data from all the sensor into one matrix per position
-% sensor_data = cell([size(normalized_data, 1) 1]);
-% for i = 1:size(normalized_data, 1)
-%     sensor_data{i} = zip_data(normalized_data(i, :));
-% end
+nchunks = numel(chunkslen);
+selected_feat = {@min; @max; @mean; @std; @skewness; @kurtosis};
+nselected_feat = numel(selected_feat);
 
 % Arrange data in case they are not multiple of any chunk size
-arranged_data = cell([size(sensor_data, 1) nchunk]);
-for i = 1:size(arranged_data, 1)
-    arranged_data(i, :) = arrange_data(sensor_data{i}, chunks);
-end
+fprintf("--> Make data multiple of chunk size\n");
+arranged_data = cellfun(@(x) arrange_data(x, chunkslen), normalized_data, 'UniformOutput', false);
 
 % Compute features for every element of arranged_data
-feature_cell = cell([ncategories nchunk nselected_feat]);
-fig_titles = cell(size(feature_cell));
-for i = 1:ncategories
-    for j = 1:nchunk 
-        for k = 1:nselected_feat
-            feature_cell{i, j, k} = get_aggr_features(arranged_data{i, j}, aggr_feat{k}, chunks(j));
+fprintf("--> Compute features per each chunk\n");
+feature_cell = cell([nselected_feat 1]);
+c = num2cell(chunkslen);
+for i = 1:nselected_feat
+    feature_cell{i} = cellfun(@(x) cellfun(@(w, y) compute_chunk_features(w, selected_feat{i}, y), x, c, ...
+                                           'UniformOutput', false), ...
+                              arranged_data, 'UniformOutput', false);
+end
+
+% Merge matrices of same features together
+fprintf("--> Merge feature matrices for each position\n");
+merged_feature = cell([nselected_feat ncategories]);
+for i = 1:nselected_feat
+    for j = 1:ncategories
+        % Merge matrix of volunteer's data for each element of the feature_cell's rows
+        merged_feature{i, j} = fold(@(a, el) cellfun(@vertcat, a, el, 'UniformOutput', false), feature_cell{i}(j, :));
+    end
+end
+
+% Create the training set, category labels and feature data
+fprintf("--> Building training set\n");
+X = cell([nchunks 1]);
+Y = cell([nchunks 1]);
+for k = 1:nchunks
+    X{k} = [];
+    for i = 1:nselected_feat
+        tempx = [];
+        tempy = [];
+        merged_row = merged_feature(i, :);
+        for j = 1:ncategories
+            training_set = merged_row{j}{k};
+            nrows = size(training_set, 1);
+            label = full(ind2vec(j, ncategories))'; % vector like [1 0 0 0]
+            tempx = vertcat(tempx, training_set);
+            tempy = vertcat(tempy, repmat(label, nrows, 1));
+        end
+        X{k} = horzcat(X{k}, tempx);
+    end
+    Y{k} = tempy;
+end
+
+% Permutate the whole test set because it is ordered and can cause problem
+% during training
+ndataseries = size(normalized_data, 2);
+for i = 1:nchunks
+    oldtrainingset = [X{i} Y{i}];
+    nrows = size(oldtrainingset, 1)/ndataseries/ncategories;
+    newtrainingset = [];
+    newtargets = [];
+    halfrows = nrows/2;
+    
+    % Create the dataset by putting bottom half rows of X{i} near the top
+    % ones and adjust Y{i} consequently
+    startoffset = 0;
+    categoryoffset = ndataseries * nrows;
+    for k = 0:ndataseries - 1
+        for  j = 0:ncategories - 1
+            startchunk = j * categoryoffset + 1 + k * nrows;
+            endchunk = startchunk + nrows - 1;
+            tempx = oldtrainingset(startchunk:endchunk, 1:end - ncategories);
+            tempy = oldtrainingset(startchunk:endchunk, end - ncategories + 1:end);
+
+            % double the features
+            if mod(halfrows, 1) == 0
+                tempx = [tempx(1:halfrows, :), tempx(halfrows + 1:end, :)];
+                tempy = tempy(1:halfrows, :);
+            else
+                tempx = [tempx(1:floor(halfrows) + 1, :), tempx(ceil(halfrows):end, :)];
+                tempy = tempy(1:floor(halfrows) + 1, :);
+            end
+            newtrainingset = vertcat(newtrainingset, [tempx tempy]);
         end
     end
+    X{i} = newtrainingset(:, 1:end - ncategories);
+    Y{i} = newtrainingset(:, end - ncategories + 1:end);
 end
 
-%% Feature selection. 
-% Create numerical labels for categories
-labels = zeros([ncategories 1]);
-for i = 1:ncategories
-    labels(i) = i;
+% Do feature selection for each chunk
+fprintf("--> Make feature selection\n");
+inmodels = cell([nchunks 1]);
+histories = cell([nchunks 1]);
+for i = 1:nchunks
+    fprintf("----> Chunk length = %d\n", chunkslen(i));
+    [inmodels{i}, histories{i}] = sequentialfs(@fscriterion, X{i}, Y{i});
 end
 
-% Merge feature matrices into one and add a label to it to create X for
-% sequentialfs function for each chunk size
-category_features = cell([ncategories nchunk]);
-for i = 1:ncategories
-    for j = 1:nchunk
-        category_features{i, j} = flatten_cell(feature_cell(i, j, :));
-    end
-end
-
-% Create a category matrix for each chunk size
-output_category = cell([ncategories nchunk]);
-labels_len = numel(configuration.CATEGORIES);
-for i = 1:ncategories
-    for j = 1:nchunk
-        nrows = size(category_features{i, j}, 1);
-        category_array = zeros([nrows 1]);
-        category_array(:) = labels(i);
-        output_category{i, j} = category_array;
-    end
-end
-
-% Make matlab to choose the best features for fitting a model
-criterion = @(xtrain, ytrain, xtest, ytest) sum(ytest ~= classify(xtest, xtrain, ytrain, 'quadratic'));
-inmodels = cell([1 nchunk]);
-histories = cell([1 nchunk]);
-for i = 1:nchunk
-    X = zip_data(category_features(:, i));
-    Y = zip_data(output_category(:, i));
-    [inmodels{1, i}, histories{1, i}] = sequentialfs(criterion, X, Y);
-end
-
-% Select optimal chunk length wrt feature, that is choose the chunk
-% length(s) with less feature
-selected_inmodels = zip_data(inmodels);
-nfeats = sum(selected_inmodels, 2);
-chunk_index = find(nfeats == min(nfeats));
-selected_features = category_features(:, chunk_index(1)); % less chunks is better
-selected_features = cellfun(@(x) x(:, inmodels{1, chunk_index(1)}), selected_features, 'UniformOutput', false);
-output_category = output_category(:, chunk_index(1));
+% For each chunk select only the needed feature for training
+X = cellfun(@(x, y) x(:, y), X, inmodels, "UniformOutput", false);
