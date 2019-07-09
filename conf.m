@@ -3,7 +3,7 @@
 % Where the project stores main.m script
 PROJECT_DIR = pwd;
 
-% Where main.m could find the data to be analyzed
+% Where main.m could find the data to be analized
 DATA_DIRS = { 'Measurements_10_volunteers/Volunteer 1';
     'Measurements_10_volunteers/Volunteer 2';
     'Measurements_10_volunteers/Volunteer 3';
@@ -52,3 +52,10 @@ CATEGORIES = {'supine' 'dorsiflexion' 'walking' 'stairs'};
 
 % Sensors' sampling time
 SAMPLING_TIME = 0.082;
+
+% Length of the chunks to be analyzed. The program will analyze each chunk
+% length and will produce a neuronal network for each chunk. It is in the
+% matlab format to define intervals: start:increment:end
+% For example 12:12:360 means [12 24 36 ... 360], that is an array of 30
+% values from 12 to 360     
+CHUNKS_TO_ANALYZE = 12:12:360;
