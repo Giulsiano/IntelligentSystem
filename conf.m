@@ -38,14 +38,9 @@ SENSOR_NUM = 3;
 % instead of loading them from the DB
 DELETE_DATA = 1;
 
-% Set the name of the directory that will store figures
-FIGURES_OUTPUT_DIR = 'figures';
-
-% Set this to 1 to save figures to the output directory also
-STORE_FIGURES = 0;
-
-% Path where the program will store figures
-FIG_PATH = 'output/figures';
+% Set to 1 if you want to have all data structure this program uses in
+% order to debug things
+DEBUG = 1;
 
 % Categories to take in account for classification
 CATEGORIES = {'supine' 'dorsiflexion' 'walking' 'stairs'};
