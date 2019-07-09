@@ -1,8 +1,14 @@
 % Giuliano Peraz <giuliano.peraz@gmail.com>
 global configuration;
 
+% Exit if there is no configuration variable that stores everything needed
+% for this program to run
+if ~exist('configuration', 'var')
+    error('ISP:configurationNotFound', 'The project requires configuration variable to work properly');
+end
+
 % Exit if no data variable has been loaded into the workspace
-if (exist('normalized_data', 'var')) ~= 1
+if ~exist('normalized_data', 'var')
     throw(MException('ISP:VariableNotFound', '%s can''t run without normalized_data variable', mfilename));
 end
 
@@ -10,7 +16,7 @@ end
 % Define features and the chunk size of sensor data to take in account for
 % features
 
-chunkslen = 12:12:404;
+chunkslen = configuration.CHUNKS_TO_ANALYZE;
 ncategories = numel(configuration.CATEGORIES);
 nchunks = numel(chunkslen);
 selected_feat = {@min; @max; @mean; @std; @skewness; @kurtosis};
@@ -23,9 +29,9 @@ arranged_data = cellfun(@(x) arrange_data(x, chunkslen), normalized_data, 'Unifo
 % Compute features for every element of arranged_data
 fprintf("--> Compute features per each chunk\n");
 feature_cell = cell([nselected_feat 1]);
-c = num2cell(chunkslen);
+chunkslen_cell = num2cell(chunkslen);
 for i = 1:nselected_feat
-    feature_cell{i} = cellfun(@(x) cellfun(@(w, y) compute_chunk_features(w, selected_feat{i}, y), x, c, ...
+    feature_cell{i} = cellfun(@(x) cellfun(@(data, chunklen) compute_chunk_features(data, selected_feat{i}, chunklen), x, chunkslen_cell, ...
                                            'UniformOutput', false), ...
                               arranged_data, 'UniformOutput', false);
 end

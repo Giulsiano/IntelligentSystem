@@ -24,23 +24,62 @@ if exist(configuration.out_dir_path, 'dir') == false
     mkdir(configuration.out_dir_path);
 end
 
-% Load data of the positions of the volunteers and make some manipolation
-% like normalization and unify data from all sensor into one
-fprintf('Manipolate data...\n');
-data_manipolation;
-fprintf('\n');
+%% Data preprocessing
+% Create the variable 'normalized_data', store it into the database to save
+% time the second time this script is run
+% Load the variables stored into the db
+storage = who('-file', configuration.db_path);
+if ~ismember('normalized_data', storage) || configuration.DELETE_DATA == true
+    % Make some computation on data, like normalization, null values removal 
+    % and things like that
+    fprintf('Preprocessing data...\n');
+    data_manipolation;
+    
+    % Save manipulated sensors' data into the database
+    fprintf('--> Saving normalized data to %s...\n', configuration.db_path);
+    save(configuration.db_path, 'normalized_data');
+    fprintf('\n');
+else 
+    % Load data from the file
+    fprintf('--> Loading normalized data from %s...\n', configuration.db_path);
+    load(configuration.db_path, 'normalized_data');
+end
 
-% Features extraction and selection
-fprintf('Feature extraction and selection...\n');
-features;
-fprintf('\n');
+% Clear variables that are not useful for the rest of the program
+if configuration.DEBUG ~= 1
+    clear -except normalized_data old_path configuration
+end
 
-% Run the neuronal network
-fprintf('Train neuronal networks\n');
+%% Features extraction and selection
+% Make the computation needed to extract features and select them for the
+% neuronal networks to work properly. It uses a lot of varuable
+% Check only the presence of X since Y is build with it
+if ~ismember('X', storage) || ~ismember('Y', storage)
+    fprintf('Feature extraction and selection...\n');
+    features;
+    fprintf('Saving training set to database...\n');
+    save(configuration.db_path, 'X', 'Y');
+    fprintf('\n');
+else
+    fprintf('Loading training set from database...\n');
+    load(configuration.db_path, 'X', 'Y');
+    fprintf('\n');
+end
+
+% Clear variables that are not useful for the rest of the program
+if configuration.DEBUG ~= 1
+    clear -except X Y old_path chunkslen configuration
+end
+
+%% Neuronal Network Training
+
+% Run the neuronal networks, one for each chunk
+fprintf('Train %d neuronal networks...\n', max(size(chunkslen)));
 nn_train;
 fprintf('\n');
 
-% Run the fuzzy system
+
+%% Define fuzzy system
 
 % Restore original path
 path(old_path);

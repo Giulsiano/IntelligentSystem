@@ -12,10 +12,9 @@ configuration.DB_FILE_NAME = DB_FILE_NAME;
 configuration.OUTPUT_DIR = OUTPUT_DIR;
 configuration.SENSOR_NUM = SENSOR_NUM;
 configuration.DELETE_DATA = DELETE_DATA;
-configuration.FIGURES_OUTPUT_DIR = FIGURES_OUTPUT_DIR;
-configuration.STORE_FIGURES = STORE_FIGURES;
-configuration.FIG_PATH = FIG_PATH;
 configuration.CATEGORIES = CATEGORIES;
 configuration.SAMPLING_TIME = SAMPLING_TIME;
+configuration.DEBUG = DEBUG;
+configuration.CHUNKS_TO_ANALYZE = CHUNKS_TO_ANALYZE;
 end
 
