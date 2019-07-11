@@ -8,10 +8,10 @@ end
 % Start training the neuronal network
 fprintf("--> Training networks for each chunk\n");
 nchunks = numel(chunkslen);
-ntrain = 10;
+ntrain = 30;
 nnets = cell([nchunks 1]);
 nneurons = 10:30;
-for i = 1:nchunks
+parfor i = 1:nchunks
     fprintf("----> chunk len = %d\n", chunkslen(i));
     inputs = X{i}';
     targets = Y{i}';
@@ -27,8 +27,10 @@ for i = 1:nchunks
         chunknet.trainParam.showWindow = 0;
         
         % Train the Network 
-        for k = 1:ntrain
+        for k = 1:ntrain %ntries
             [chunknet, tr] = train(chunknet, inputs, targets);
+            % check performance here, if it is worse than before continue
+            % but increment the ntries
         end
         
         % Check if this network is better of the one with less neurons
@@ -42,31 +44,31 @@ for i = 1:nchunks
             net_infos.outputs = outputs;
             net_infos.targets = targets;
             net_infos.errors = errors;
+            net_infos.performance = performance;
             nnets{i} = net_infos;
+            previous_net_perf = performance;
         end
-        previous_net_perf = performance;        
     end
 end
 
-%% Plot performance of each network
-for j = 1:numel(nnets)
-    net_infos = nnets{j};
-    figure(j);
-    fig_title = {sprintf("Chunk len = %d", chunkslen), sprintf("# neurons = %d", net_infos.net.layers{1}.size)};
-    title(fig_title);
-    
-    % Plot confusion matrix, error histograms, performance and train state
-    % of the net
-    title([fig_title, "Confusion matrix"]);
-    plotconfusion(net_infos.targets, net_infos.outputs);
-    
-%     title("Performance");
-%     plotperform(net_infos.tr);
+% %% Plot performance of each network
+% for j = 1:numel(nnets)
+%     net_infos = nnets{j};
+%     figure(j);
+%     fig_title = {sprintf("Chunk len = %d", chunkslen(j)), sprintf("# neurons = %d", net_infos.net.layers{1}.size)};
 %     
-%     title("Train state");
-%     plottrainstate(net_infos.tr);
+%     % Plot confusion matrix, error histograms, performance and train state
+%     % of the net
+%     plotconfusion(net_infos.targets, net_infos.outputs);
+%     title(fig_title);
 %     
-%     title("Error histogram");
-%     ploterrhist(net_infos.errors);
-end
+% %     title("Performance");
+% %     plotperform(net_infos.tr);
+% %     
+% %     title("Train state");
+% %     plottrainstate(net_infos.tr);
+% %     
+% %     title("Error histogram");
+% %     ploterrhist(net_infos.errors);
+% end
 
