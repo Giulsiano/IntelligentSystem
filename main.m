@@ -74,14 +74,55 @@ if configuration.DEBUG ~= 1
 end
 
 %% Neuronal Network Training
-
 % Run the neuronal networks, one for each chunk
 fprintf('Train %d neuronal networks...\n', max(size(chunkslen)));
 nn_train;
 fprintf('\n');
 
+%% Fuzzy System training and testing
+% Take the chunk with the best neuronal network
+chosen_chunk = 0;
+previous_best_perf = +Inf;
+for i = 1:numel(chunkslen)
+    if nnets{i}.performance < previous_best_perf
+        chosen_chunk = i;
+        previous_best_perf = nnets{i}.performance;
+    end
+end
 
-%% Define fuzzy system
+% Create the training set from X and Y for plotting features and choose the rules
+fuzzyx = X{chosen_chunk};
+fuzzyy = Y{chosen_chunk};
+tempx = [];
+tempy = [];
+nfeatures = size(fuzzyx, 2);
+features_plot = cell(nfeatures, 1);
+cellfun(@(x) [], features_plot, 'UniformOutput', false);
+ncategories = numel(configuration.CATEGORIES);
+for i = 1:ncategories
+    indeces = fuzzyy(:, i) == 1;      
+    for j = 1:nfeatures
+        features_plot{j} = horzcat(features_plot{j}, fuzzyx(indeces, j));
+    end
+   
+    tempx = vertcat(tempx, fuzzyx(indeces, :));
+    tempy = vertcat(tempy, fuzzyy(indeces, :));
+end
+
+fuzzyx = tempx;
+fuzzyy = tempy;
+
+% Plot each feature to choose the ones we need for fuzzy systems to be
+% trained
+%fignum = get(gcf, 'Number');
+for i = 1:nfeatures
+    figure(i);
+    bar(sort(features_plot{i})');
+    title(sprintf("feature %d", i));
+    xticklabels(configuration.CATEGORIES);
+    yline(max(max(features_plot{i})));
+    yline(min(min(features_plot{i})));
+end
 
 % Restore original path
 path(old_path);
