@@ -55,7 +55,7 @@ end
 % Make the computation needed to extract features and select them for the
 % neuronal networks to work properly. It uses a lot of varuable
 % Check only the presence of X since Y is build with it
-if ~ismember('X', storage) || ~ismember('Y', storage)
+if ~ismember('X', storage) || ~ismember('Y', storage) || configuration.RUN_SEQUENTIALFS == 1
     fprintf('Feature extraction and selection...\n');
     features;
     fprintf('Saving training set to database...\n');
@@ -64,6 +64,7 @@ if ~ismember('X', storage) || ~ismember('Y', storage)
 else
     fprintf('Loading training set from database...\n');
     load(configuration.db_path, 'X', 'Y');
+    chunkslen = configuration.CHUNKS_TO_ANALYZE;
     fprintf('\n');
 end
 

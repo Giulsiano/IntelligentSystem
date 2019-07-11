@@ -24,6 +24,9 @@ FILE_PATTERN = {'*supine.xlsx';
              '*stairs.xlsx';
 };
 
+% Categories to take in account for classification
+CATEGORIES = {'supine' 'dorsiflexion' 'walking' 'stairs'};
+
 % The name of the file where main.m stores data from files in order to avoid loading data from files
 % each time main.m is run
 DB_FILE_NAME = 'db.mat';
@@ -36,14 +39,15 @@ SENSOR_NUM = 3;
 
 % Set to 1 if you want to load raw data from files each time you run main.m
 % instead of loading them from the DB
-DELETE_DATA = 1;
+DELETE_DATA = 0;
 
 % Set to 1 if you want to have all data structure this program uses in
 % order to debug things
 DEBUG = 1;
 
-% Categories to take in account for classification
-CATEGORIES = {'supine' 'dorsiflexion' 'walking' 'stairs'};
+% Set this to 1 if you want to make feature selection each run of the
+% program
+RUN_SEQUENTIALFS = 0;
 
 % Sensors' sampling time
 SAMPLING_TIME = 0.082;
@@ -52,5 +56,5 @@ SAMPLING_TIME = 0.082;
 % length and will produce a neuronal network for each chunk. It is in the
 % matlab format to define intervals: start:increment:end
 % For example 12:12:360 means [12 24 36 ... 360], that is an array of 30
-% values from 12 to 360     
+% values from 12 to 360    
 CHUNKS_TO_ANALYZE = 12:12:360;

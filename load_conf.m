@@ -16,5 +16,6 @@ configuration.CATEGORIES = CATEGORIES;
 configuration.SAMPLING_TIME = SAMPLING_TIME;
 configuration.DEBUG = DEBUG;
 configuration.CHUNKS_TO_ANALYZE = CHUNKS_TO_ANALYZE;
+configuration.RUN_SEQUENTIALFS = RUN_SEQUENTIALFS;
 end
 
