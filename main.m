@@ -37,7 +37,7 @@ if ~ismember('normalized_data', storage) || configuration.DELETE_DATA == true
     
     % Save manipulated sensors' data into the database
     fprintf('--> Saving normalized data to %s...\n', configuration.db_path);
-    save(configuration.db_path, 'normalized_data');
+    save(configuration.db_path, 'normalized_data', '-append');
     fprintf('\n');
 else 
     % Load data from the file
@@ -58,7 +58,7 @@ if ~ismember('X', storage) || ~ismember('Y', storage)
     fprintf('Feature extraction and selection...\n');
     features;
     fprintf('Saving training set to database...\n');
-    save(configuration.db_path, 'X', 'Y');
+    save(configuration.db_path, 'X', 'Y', '-append');   % Overwrite existing variables
     fprintf('\n');
 else
     fprintf('Loading training set from database...\n');
