@@ -3,6 +3,7 @@ function e = fscriterion(xtrain, ytrain, xtest, ytest)
 
 inputs = xtrain'; % It expects data on rows
 targets = ytrain';
+ntrain = 10;
 
 % DEBUG make this number not hardcoded
 net = patternnet(10);
@@ -14,10 +15,12 @@ net.divideParam.testRatio = 15/100;
 net.trainParam.showWindow = 0;
 
 % Train the network
-[trainedNet, ~] = train(net, inputs, targets);
+for i = 1:ntrain
+    [net, ~] = train(net, inputs, targets);
+end
 
 % Compute error using xtest and ytest as input and validation targets
-outputs = trainedNet(xtest');
+outputs = net(xtest');
 output_class = vec2ind(outputs);
 target_class = vec2ind(ytest');
 
