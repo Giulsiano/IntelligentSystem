@@ -41,6 +41,7 @@ if ~ismember('normalized_data', storage) || configuration.DELETE_DATA == true
     fprintf('\n');
 else 
     % Load data from the file
+    fprintf('Find normalized data in %s...\n', configuration.db_path);
     fprintf('--> Loading normalized data from %s...\n', configuration.db_path);
     load(configuration.db_path, 'normalized_data');
 end
