@@ -19,8 +19,8 @@ end
 chunkslen = configuration.CHUNKS_TO_ANALYZE;
 ncategories = numel(configuration.CATEGORIES);
 nchunks = numel(chunkslen);
-selected_feat = {@min; @max; @mean; @std; @skewness; @kurtosis};
-nselected_feat = numel(selected_feat);
+featfun = {@min; @max; @mean; @std; @skewness; @kurtosis};  % Feature function
+nfeatfun = numel(featfun);
 
 % Arrange data in case they are not multiple of any chunk size
 fprintf("--> Make data multiple of chunk size\n");
@@ -28,18 +28,18 @@ arranged_data = cellfun(@(x) arrange_data(x, chunkslen), normalized_data, 'Unifo
 
 % Compute features for every element of arranged_data
 fprintf("--> Compute features per each chunk\n");
-feature_cell = cell([nselected_feat 1]);
+feature_cell = cell([nfeatfun 1]);
 chunkslen_cell = num2cell(chunkslen);
-for i = 1:nselected_feat
-    feature_cell{i} = cellfun(@(x) cellfun(@(data, chunklen) compute_chunk_features(data, selected_feat{i}, chunklen), x, chunkslen_cell, ...
+for i = 1:nfeatfun
+    feature_cell{i} = cellfun(@(x) cellfun(@(data, chunklen) compute_chunk_features(data, featfun{i}, chunklen), x, chunkslen_cell, ...
                                            'UniformOutput', false), ...
                               arranged_data, 'UniformOutput', false);
 end
 
 % Merge matrices of same features together
 fprintf("--> Merge feature matrices for each position\n");
-merged_feature = cell([nselected_feat ncategories]);
-for i = 1:nselected_feat
+merged_feature = cell([nfeatfun ncategories]);
+for i = 1:nfeatfun
     for j = 1:ncategories
         % Merge matrix of volunteer's data for each element of the feature_cell's rows
         merged_feature{i, j} = fold(@(a, el) cellfun(@vertcat, a, el, 'UniformOutput', false), feature_cell{i}(j, :));
@@ -52,7 +52,7 @@ X = cell([nchunks 1]);
 Y = cell([nchunks 1]);
 for k = 1:nchunks
     X{k} = [];
-    for i = 1:nselected_feat
+    for i = 1:nfeatfun
         tempx = [];
         tempy = [];
         merged_row = merged_feature(i, :);
@@ -79,7 +79,8 @@ for i = 1:nchunks
     halfrows = nrows/2;
     
     % Create the dataset by putting bottom half rows of X{i} near the top
-    % ones and adjust Y{i} consequently
+    % ones and remove Y{i}'s rows consequently (since there are half the
+    % values
     startoffset = 0;
     categoryoffset = ndataseries * nrows;
     for k = 0:ndataseries - 1
@@ -108,7 +109,7 @@ end
 fprintf("--> Make feature selection\n");
 inmodels = cell([nchunks 1]);
 histories = cell([nchunks 1]);
-for i = 1:nchunks
+parfor i = 1:nchunks
     fprintf("----> Chunk length = %d\n", chunkslen(i));
     [inmodels{i}, histories{i}] = sequentialfs(@fscriterion, X{i}, Y{i});
 end
